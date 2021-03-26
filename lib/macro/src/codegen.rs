@@ -1,0 +1,82 @@
+//
+// Hippo
+// (C) 2021 Brave Monday
+//
+
+use proc_macro2 as pm2;
+
+use proc_macro_error::abort_call_site;
+use quote::{quote, ToTokens};
+
+/// An output container that enables selective code generation based on type.
+pub enum Container {
+	Bytes(Vec<u8>),
+	Utf8(String)
+}
+
+impl Container {
+	/// Deduce the backing type of the data.
+	pub fn deduce_type(&self) -> syn::Type {
+		let text = match self {
+			Container::Bytes(b) => format!("[u8; {}]", b.len()),
+			Container::Utf8(_)  => "&'static str".to_string()
+		};
+
+		syn::parse_str(&text).unwrap_or_else(
+			|e| abort_call_site!("cannot deduce output type: {}", e)
+		)
+	}
+}
+
+impl ToTokens for Container {
+	/// Render a data container into a `TokenStream`.
+	fn to_tokens(&self, tokens: &mut pm2::TokenStream) {
+		match self {
+			Container::Bytes(b) => tokens.extend(quote! {
+				[ #(#b),* ]
+			}),
+			Container::Utf8(s) => s.to_tokens(tokens)
+		}
+	}
+}
+
+/// Produce an AST for the implementation.
+pub fn emit(ast: syn::DeriveInput, data: Container) -> pm2::TokenStream {
+	let name = &ast.ident;
+	let ty   = data.deduce_type();
+
+	let (ig, tg, wc) = ast.generics.split_for_impl();
+
+	let mut tokens = quote! {
+		use hippo_shared::Preprocessed;
+
+		impl #ig #name #tg #wc {
+			const HIPPO_DATA: #ty = #data;
+		}
+
+		impl #ig Preprocessed<#ty> for #name #tg #wc {
+			fn preprocessed_data() -> &'static #ty {
+				&Self::HIPPO_DATA
+			}
+		}
+	};
+
+	tokens.extend(match data {
+		Container::Bytes(_) => quote! {
+			impl #ig std::fmt::Display for #name #tg #wc {
+				fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+					write!(f, "{:?}", Self::preprocessed_data())
+				}
+			}
+		},
+		Container::Utf8(_) => quote! {
+			impl #ig std::fmt::Display for #name #tg #wc {
+				fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+					write!(f, "{}", Self::preprocessed_data())
+				}
+			}
+		}
+	});
+
+	tokens
+}

@@ -1,0 +1,14 @@
+#
+# Hippo
+# (C) 2021 Brave Monday
+#
+
+[package]
+name    = "hippo-shared"
+version = "0.1.0"
+authors = ["Fredrik Krantz <pfk@bravemonday.com>"]
+edition = "2018"
+
+[dependencies]
+serde = { version = "^1.0.0", features = ["derive"] }
+toml  = { version = "^0.5.0" }

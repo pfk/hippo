@@ -1,0 +1,24 @@
+#
+# Hippo
+# (C) 2021 Brave Monday
+#
+
+[package]
+name    = "hippo"
+version = "0.1.0"
+description = "A compile-time preprocessor for web assets."
+authors = ["Fredrik Krantz <pfk@bravemonday.com>"]
+edition = "2018"
+license = "ISC"
+
+repository = "https://github.com/pfk/hippo"
+
+keywords   = ["preprocessor"]
+categories = ["web-programming"]
+
+[workspace]
+members = ["lib/*"]
+
+[dependencies]
+hippo-macro  = { path = "lib/macro" }
+hippo-shared = { path = "lib/shared" }

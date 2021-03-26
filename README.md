@@ -12,6 +12,7 @@ A `struct` or `enum` may derive from `Preprocess` to embed the output of a comma
 processed output can be accessed via `Self::HIPPO_DATA`, `Self::preprocessed_data()` or
 its `Display` implementation.
 
+### Rust
 ```rust
 use hippo::Preprocess;
 
@@ -20,6 +21,7 @@ use hippo::Preprocess;
 pub struct MainCSS;
 ```
 
+### Hippo.toml
 ```toml
 [sass]
 command = "sassc"
@@ -27,8 +29,6 @@ flags   = ["-t", "compressed"]
 prefix  = "static/"
 format  = "utf-8"
 ```
-
-...
 
 ## Configuration
 
@@ -38,11 +38,13 @@ preprocessors that will be made available to any `struct` or `enum` that derives
 
 A preprocessor is identified by its TOML section and its behavior is controlled by its
 key-value pairs. The following key-value pairs are recognized:
-- `command = STRING`: The command to be executed. Mandatory.
-- `flags`  = [STRING]: A collection of command options. Optional.
-- `prefix` = STRING: A path prefix to be prepended to input arguments. Optional.
-- `format` = STRING: The output format of the command; `"bytes"` or `"utf-8"`` are
-  acceptable. Defaults to `"bytes"`.
+
+| Key     | Type         | Description                                                   |
+| ------- | ------------ | ------------------------------------------------------------- |
+| command | String       | The command to be executed. Mandatory.                        |
+| flags   | String Array | A collection of command options. Optional.                    |
+| prefix  | String       | A path prefix to be prepended to input arguments. Optional.   |
+| format  | String       | The output format. Must be `"bytes"` (default) or `"utf-8"`.  |
 
 ## Limitations
 

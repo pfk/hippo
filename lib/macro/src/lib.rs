@@ -26,8 +26,8 @@ pub fn preprocess(ast: pm1::TokenStream) -> pm1::TokenStream {
 	let ast  = syn::parse_macro_input!(ast as syn::DeriveInput);
 	let meta = Meta::new(&ast);
 
-	let pp_name   = &meta.preprocessor;
-	let pp_inputs = &meta.inputs;
+	let name   = &meta.preprocessor;
+	let inputs = &meta.inputs;
 
 	let cfg_path = Configuration::locate().unwrap_or_else(
 		|| abort_call_site!("Hippo configuration file could not be located")
@@ -37,11 +37,11 @@ pub fn preprocess(ast: pm1::TokenStream) -> pm1::TokenStream {
 		|e| abort_call_site!("Hippo configuration contains one or more errors: {}", e)
 	);
 
-	let pp = cfg.preprocessors.get(pp_name).unwrap_or_else(
-		|| abort_call_site!("preprocessor `{}` not found in configuration", pp_name)
+	let pp = cfg.preprocessors.get(name).unwrap_or_else(
+		|| abort_call_site!("preprocessor `{}` not found in configuration", name)
 	);
 
-	let out = pp.execute(pp_inputs.to_vec()).unwrap_or_else(
+	let out = pp.execute(inputs.to_vec()).unwrap_or_else(
 		|e| abort_call_site!("preprocessor command resulted in an error: {}", e)	
 	);
 
@@ -49,10 +49,12 @@ pub fn preprocess(ast: pm1::TokenStream) -> pm1::TokenStream {
 		match pp.format {
 			OutputFormat::Bytes => emit(
 				ast,
+				inputs,
 				Container::Bytes(out.stdout.into())
 			),
 			OutputFormat::Utf8 => emit(
 				ast,
+				inputs,
 				Container::Utf8(String::from_utf8_lossy(&out.stdout).to_string())
 			)
 		}

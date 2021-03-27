@@ -6,7 +6,7 @@
 use proc_macro2 as pm2;
 
 use proc_macro_error::abort_call_site;
-use quote::{quote, ToTokens};
+use quote::{format_ident, quote, ToTokens};
 
 /// An output container that enables selective code generation based on type.
 pub enum Container {
@@ -41,7 +41,7 @@ impl ToTokens for Container {
 }
 
 /// Produce an AST for the implementation.
-pub fn emit(ast: syn::DeriveInput, data: Container) -> pm2::TokenStream {
+pub fn emit(ast: syn::DeriveInput, inputs: &Vec<String>, data: Container) -> pm2::TokenStream {
 	let name = &ast.ident;
 	let ty   = data.deduce_type();
 
@@ -77,6 +77,26 @@ pub fn emit(ast: syn::DeriveInput, data: Container) -> pm2::TokenStream {
 			}
 		}
 	});
+
+	// Output original data with built-in include macros to force the compiler to
+	// consider the input files when tracking changes. Hopefully, the compiler will
+	// aggressively remove these unless they're used directly.
+	for (i, v) in inputs.iter().enumerate() {
+		let ident = format_ident!("HIPPO_ORIGINAL_DATA_{}", i);
+
+		tokens.extend(match data {
+			Container::Bytes(_) => quote! {
+				impl #ig #name #tg #wc {
+					const #ident: #ty = &include_bytes!(#v);
+				}
+			},
+			Container::Utf8(_) => quote! {
+				impl #ig #name #tg #wc {
+					const #ident: #ty = &include_str!(#v);
+				}
+			},
+		});
+	}
 
 	tokens
 }

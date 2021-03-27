@@ -45,8 +45,3 @@ key-value pairs. The following key-value pairs are recognized:
 | flags   | String Array | A collection of command options. Optional.                    |
 | prefix  | String       | A path prefix to be prepended to input arguments. Optional.   |
 | format  | String       | The output format. Must be `"bytes"` (default) or `"utf-8"`.  |
-
-## Limitations
-
-- Hippo cannot automatically detect changes to `Hippo.conf` or any files references by
-  a derivative entity.

@@ -87,7 +87,7 @@ pub fn emit(ast: syn::DeriveInput, inputs: &Vec<String>, data: Container) -> pm2
 		tokens.extend(match data {
 			Container::Bytes(_) => quote! {
 				impl #ig #name #tg #wc {
-					const #ident: #ty = &include_bytes!(#v);
+					const #ident: &'static #ty = &include_bytes!(#v);
 				}
 			},
 			Container::Utf8(_) => quote! {

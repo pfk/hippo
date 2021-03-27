@@ -3,8 +3,9 @@
 // (C) 2021 Brave Monday
 //
 
+use std::env;
 use std::io::Result;
-use std::path::Path;
+use std::path::PathBuf;
 use std::process::{Command, Output};
 
 use serde::Deserialize;
@@ -42,13 +43,28 @@ impl Preprocessor {
 		}
 	}
 
-	/// Execute the preprocessor with input arguments.
-	pub fn execute(&self, args: Vec<String>) -> Result<Output> {
-		let base = self.prefix.clone().unwrap_or("".to_string());
-		let args = args.iter().map(|p|
-			Path::new(&base).join(p).to_string_lossy().to_string()
-		).collect::<Vec<_>>();
+	/// Rewrite input arguments into absolute paths.
+	pub fn rewrite_arguments(&self, args: &Vec<String>) -> Vec<String> {
+		args.iter().map(|p| {
+			let mut buf = PathBuf::new();
 
+			if let Some(root) = env::var("CARGO_MANIFEST_DIR").ok() {
+				buf.push(root);
+			}
+
+			if let Some(prefix) = &self.prefix {
+				buf.push(prefix);
+			}
+
+			buf.push(p);
+
+			buf.to_string_lossy().to_string()
+		})
+		.collect::<Vec<String>>()
+	}
+
+	/// Execute the preprocessor with input arguments.
+	pub fn execute(&self, args: &Vec<String>) -> Result<Output> {
 		Command::new(&self.command)
 			.args(&self.flags)
 			.args(args)

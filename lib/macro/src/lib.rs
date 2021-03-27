@@ -41,7 +41,9 @@ pub fn preprocess(ast: pm1::TokenStream) -> pm1::TokenStream {
 		|| abort_call_site!("preprocessor `{}` not found in configuration", name)
 	);
 
-	let out = pp.execute(inputs.to_vec()).unwrap_or_else(
+	let inputs = pp.rewrite_arguments(inputs);
+
+	let out = pp.execute(&inputs).unwrap_or_else(
 		|e| abort_call_site!("preprocessor command resulted in an error: {}", e)	
 	);
 
@@ -49,12 +51,12 @@ pub fn preprocess(ast: pm1::TokenStream) -> pm1::TokenStream {
 		match pp.format {
 			OutputFormat::Bytes => emit(
 				ast,
-				inputs,
+				&inputs,
 				Container::Bytes(out.stdout.into())
 			),
 			OutputFormat::Utf8 => emit(
 				ast,
-				inputs,
+				&inputs,
 				Container::Utf8(String::from_utf8_lossy(&out.stdout).to_string())
 			)
 		}

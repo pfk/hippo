@@ -5,7 +5,7 @@
 
 [package]
 name    = "hippo-macro"
-version = "0.2.0"
+version = "0.2.1"
 authors = ["Fredrik Krantz <pfk@bravemonday.com>"]
 edition = "2018"
 

@@ -48,7 +48,7 @@ pub fn emit(ast: syn::DeriveInput, inputs: &Vec<String>, data: Container) -> pm2
 	let (ig, tg, wc) = ast.generics.split_for_impl();
 
 	let mut tokens = quote! {
-		use hippo_shared::Preprocessed;
+		use hippo::Preprocessed;
 
 		impl #ig #name #tg #wc {
 			const HIPPO_DATA: #ty = #data;

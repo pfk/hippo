@@ -13,7 +13,7 @@ edition = "2018"
 proc-macro = true
 
 [dependencies]
-hippo-shared = { path = "../shared" }
+hippo-shared = { version = "^0.1.0", path = "../shared" }
 
 proc-macro2      = { version = "^1.0" }
 proc-macro-error = { version = "^1.0" }

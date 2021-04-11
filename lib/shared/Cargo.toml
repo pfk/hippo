@@ -6,8 +6,10 @@
 [package]
 name    = "hippo-shared"
 version = "0.1.1"
+description = "A support library for Hippo."
 authors = ["Fredrik Krantz <pfk@bravemonday.com>"]
 edition = "2018"
+license = "ISC"
 
 [dependencies]
 serde = { version = "^1.0.0", features = ["derive"] }

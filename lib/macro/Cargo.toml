@@ -6,8 +6,10 @@
 [package]
 name    = "hippo-macro"
 version = "0.2.1"
+description = "A macro support library for Hippo."
 authors = ["Fredrik Krantz <pfk@bravemonday.com>"]
 edition = "2018"
+license = "ISC"
 
 [lib]
 proc-macro = true

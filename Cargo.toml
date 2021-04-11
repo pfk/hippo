@@ -20,5 +20,5 @@ categories = ["web-programming"]
 members = ["lib/*"]
 
 [dependencies]
-hippo-macro  = { path = "lib/macro" }
-hippo-shared = { path = "lib/shared" }
+hippo-macro  = { version = "^0.2.0", path = "lib/macro"  }
+hippo-shared = { version = "^0.1.0", path = "lib/shared" }
